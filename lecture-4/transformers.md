@@ -1,34 +1,99 @@
-### Tóm tắt  
-Bài giảng này giới thiệu tổng quan về kiến trúc Transformer – nền tảng chính của các mô hình ngôn ngữ lớn (LLM) hiện đại như GPT. Transformer được giới thiệu lần đầu trong bài báo “Attention is All You Need” năm 2017 và đã tạo ra bước đột phá lớn trong các nhiệm vụ dịch máy, chuyển đổi ngôn ngữ. Kiến trúc này bao gồm hai thành phần chính: bộ mã hóa (encoder) và bộ giải mã (decoder). Quá trình hoạt động của Transformer bắt đầu bằng việc tách câu thành các token, ánh xạ các token này thành các vector embedding trong không gian đa chiều để biểu diễn ý nghĩa ngữ cảnh. Bộ decoder sau đó sử dụng các vector này cùng với phần văn bản đầu ra tạm thời để dự đoán từng từ tiếp theo trong câu dịch.  
+# Hiểu Biết Kiến Trúc Transformer
+
+## Transformer là gì?
+Transformer là một **kiến trúc mạng nơ-ron** được giới thiệu trong bài báo “**Attention is All You Need**” (2017), trở thành nền tảng cho các mô hình ngôn ngữ lớn (LLMs) như GPT và BERT. Transformer xử lý dữ liệu chuỗi (như văn bản) hiệu quả, đặc biệt trong các nhiệm vụ xử lý ngôn ngữ tự nhiên (NLP) như dịch máy, tạo văn bản, và phân tích cảm xúc. Ngoài ra, nó còn được áp dụng trong thị giác máy tính (Vision Transformers - ViT).
+
+**Điểm mạnh**:
+- **Xử lý song song**: Xử lý toàn bộ câu cùng lúc, nhanh hơn RNN hay LSTM.
+- **Self-Attention**: Tập trung vào các từ quan trọng, nắm bắt mối quan hệ ngữ cảnh dài hạn.
+
+## Các thành phần chính của Transformer
+
+### 1. Bộ mã hóa (Encoder)
+- **Chức năng**: Chuyển câu đầu vào thành **vector embedding** biểu diễn ý nghĩa ngữ cảnh.
+- **Cấu trúc**:
+  - Gồm **N lớp encoder** (thường 6 hoặc 12 lớp).
+  - Mỗi lớp có:
+    - **Multi-Head Self-Attention**: Xác định mức độ quan trọng của các từ.
+    - **Feed-Forward Neural Network**: Tinh chỉnh vector embedding.
+    - **Layer Normalization và Residual Connections**: Ổn định huấn luyện.
+- **Quy trình**:
+  1. Token hóa câu (ví dụ: “Tôi ăn cơm” → ["Tôi", "ăn", "cơm"]).
+  2. Ánh xạ token thành vector embedding (ví dụ: “Tôi” → [0.5, -0.2, 0.1, …]).
+  3. Self-attention xác định mối quan hệ (ví dụ: “ăn” liên quan đến “cơm”).
+  4. Feed-forward tạo vector biểu diễn ngữ cảnh đầy đủ.
+- **Ví dụ**: Trong “Con mèo ăn cá trên bàn”, encoder xác định “cá” quan trọng hơn “bàn” khi hiểu hành động của “mèo”.
+
+### 2. Bộ giải mã (Decoder)
+- **Chức năng**: Dự đoán từ tiếp theo trong chuỗi đầu ra, sử dụng vector từ encoder.
+- **Cấu trúc**:
+  - Gồm **N lớp decoder**.
+  - Mỗi lớp có:
+    - **Masked Multi-Head Self-Attention**: Chỉ xem từ trước đó.
+    - **Encoder-Decoder Attention**: Liên kết với đầu vào từ encoder.
+    - **Feed-Forward Neural Network**: Tinh chỉnh vector đầu ra.
+    - **Layer Normalization và Residual Connections**.
+- **Quy trình**:
+  1. Nhận văn bản đầu ra tạm thời (ví dụ: “Tôi ăn…”).
+  2. Dự đoán từ tiếp theo (ví dụ: “cơm”).
+  3. Lặp lại để hoàn thành chuỗi.
+- **Ví dụ**: Dịch “I eat rice” → “Tôi ăn cơm”, decoder sinh từng từ dựa trên encoder.
 
 ![Parameters](/images/transformers-lec4.png)
 
-Bài giảng cũng giải thích khái niệm cơ chế tự chú ý (self-attention), cho phép mô hình xác định mức độ quan trọng của từng từ trong câu, giúp nắm bắt các mối quan hệ dài hạn giữa các từ trong ngữ cảnh.  
+### 3. Cơ chế tự chú ý (Self-Attention)
+- **Khái niệm**: Xác định mức độ quan trọng của từng từ đối với các từ khác.
+- **Cách hoạt động**:
+  - Mỗi token có ba vector: **Query (Q)**, **Key (K)**, **Value (V)**.
+  - Tính **điểm chú ý**: `Score = Q * K^T / sqrt(d_k)`, chuẩn hóa bằng softmax.
+  - Nhân xác suất với Value để tạo đầu ra.
+  - **Multi-Head Attention**: Thực hiện nhiều lần self-attention để nắm bắt nhiều khía cạnh.
+- **Ví dụ**: Trong “Con mèo ăn cá trên bàn”, “ăn” chú ý nhiều đến “cá” hơn “bàn”.
+- **Ý nghĩa**: Hiểu mối quan hệ dài hạn, nhanh hơn RNN/LSTM.
 
-Ngoài ra, bài giảng phân biệt rõ ràng giữa Transformer và LLM, cũng như các biến thể sau này của Transformer như BERT và GPT. BERT sử dụng bộ mã hóa và tập trung vào việc dự đoán các từ bị ẩn trong câu bằng cách xem xét cả ngữ cảnh hai chiều (trái và phải), rất phù hợp cho các tác vụ như phân tích cảm xúc. Ngược lại, GPT chỉ sử dụng bộ giải mã và dự đoán từ tiếp theo theo hướng từ trái sang phải, phù hợp cho việc tạo văn bản tuần tự.  
+### 4. Token hóa và Vector Embedding
+- **Token hóa**: Chia câu thành token (ví dụ: “Tôi ăn cơm” → ["Tôi", "ăn", "cơm"]).
+- **Vector Embedding**: Ánh xạ token thành vector số trong không gian đa chiều (ví dụ: “king” và “queen” gần nhau hơn “king” và “apple”).
+- **Positional Encoding**: Thêm thông tin vị trí (dùng hàm sin/cos) để giữ thứ tự từ.
 
-Cuối cùng, bài giảng nhấn mạnh rằng không phải tất cả các Transformer đều là LLM và cũng không phải tất cả LLM đều dựa trên Transformer, vì trước đây còn có các mô hình mạng nơ-ron hồi tiếp (RNN), mạng bộ nhớ dài-ngắn hạn (LSTM) và các kiến trúc CNN cũng có thể thực hiện các tác vụ mô hình ngôn ngữ.  
+## Cách Transformer hoạt động
+1. **Đầu vào**: Token hóa câu, chuyển thành vector embedding, thêm positional encoding.
+2. **Encoder**: Tạo vector biểu diễn ngữ cảnh qua self-attention và feed-forward.
+3. **Decoder**: Sinh chuỗi đầu ra từng từ, sử dụng masked self-attention và encoder-decoder attention.
+4. **Đầu ra**: Chuỗi văn bản mới (bản dịch, câu trả lời).
 
-### Điểm nhấn quan trọng  
-- 🔑 Transformer là kiến trúc nền tảng của hầu hết các mô hình ngôn ngữ lớn hiện đại.  
-- 🧩 Quá trình tiền xử lý bao gồm token hóa và ánh xạ token thành vector embedding để biểu diễn ngữ nghĩa.  
-- 🔍 Cơ chế tự chú ý (self-attention) là điểm mấu chốt giúp mô hình hiểu được mối quan hệ dài hạn giữa các từ trong câu.  
-- 🔄 Transformer bao gồm hai thành phần chính: encoder và decoder, nhưng GPT chỉ có decoder, BERT chỉ có encoder.  
-- 🧠 BERT là mô hình hai chiều, hiệu quả trong các nhiệm vụ như phân tích cảm xúc nhờ khả năng dự đoán từ bị ẩn trong ngữ cảnh.  
-- ⚙️ GPT dự đoán từ tiếp theo theo trình tự từ trái sang phải, áp dụng cho việc sinh văn bản.  
-- 🌐 Không phải tất cả Transformers đều là LLM và không phải tất cả LLM đều dựa trên Transformer; có các mô hình khác như RNN, LSTM và CNN cũng có thể là LLM.  
+**Ví dụ dịch máy**:
+- Đầu vào: “I eat rice”.
+- Encoder: Tạo vector cho “I”, “eat”, “rice”.
+- Decoder: Sinh “Tôi ăn cơm” từng từ.
 
-### Những hiểu biết quan trọng  
-- 📜 **Sự phát triển của Transformer từ bài báo “Attention is All You Need”**: Bài báo năm 2017 đã mở ra kỷ nguyên mới cho các mô hình ngôn ngữ, thay thế các mô hình RNN truyền thống bằng kiến trúc dựa trên attention, giúp xử lý song song hiệu quả và nắm bắt được các mối quan hệ ngữ cảnh dài hạn. Điều này làm cho các mô hình như GPT và BERT có thể đạt hiệu suất cực kỳ cao trong nhiều nhiệm vụ NLP.  
+## Các biến thể của Transformer
+- **BERT**: Dùng encoder, ngữ cảnh hai chiều, tốt cho phân tích cảm xúc, phân loại văn bản.
+- **GPT**: Dùng decoder, sinh văn bản tuần tự, tốt cho tạo văn bản, trả lời câu hỏi.
 
-- 🧮 **Token hóa và vector embedding giải quyết bài toán biểu diễn ngữ cảnh**: Việc chuyển đổi câu thành các token và ánh xạ token thành vector trong không gian đa chiều cho phép mô hình hiểu được mối liên hệ ngữ nghĩa giữa các từ, ví dụ như “king”, “man”, “woman” có vector gần nhau ngữ nghĩa hơn so với “king” và một loại trái cây. Đây là bước nền tảng để mô hình có thể xử lý ngôn ngữ tự nhiên hiệu quả.  
+## Tại sao Transformer quan trọng?
+- **Hiệu quả**: Xử lý song song, nhanh hơn RNN/LSTM.
+- **Ngữ cảnh dài hạn**: Self-attention nắm bắt mối quan hệ xa.
+- **Ứng dụng đa dạng**: NLP (dịch máy, tạo văn bản) và thị giác máy tính (phân loại ảnh).
 
-- 🔄 **Phân biệt rõ ràng giữa encoder và decoder trong Transformer**: Encoder chịu trách nhiệm mã hóa thông tin đầu vào thành embedding, còn decoder dựa vào embedding và thông tin đầu ra tạm thời để sinh kết quả. Điều này tạo nên sự linh hoạt trong các ứng dụng khác nhau, ví dụ như dịch máy, tạo văn bản, hay hoàn thiện câu.  
+## Chi tiết bổ sung
+### Cách tính Self-Attention
+- Mỗi token có vector **Q**, **K**, **V**.
+- Tính điểm chú ý: `Score = Q * K^T / sqrt(d_k)`, chuẩn hóa bằng softmax.
+- Đầu ra: Nhân xác suất với Value.
+- **Ví dụ**: Trong “Con mèo ăn cá”, “ăn” chú ý nhiều đến “cá” qua điểm chú ý cao.
 
-- 👁️‍🗨️ **Cơ chế self-attention cho phép mô hình xử lý phụ thuộc dài hạn**: Một trong những điểm mạnh lớn nhất của Transformer chính là khả năng cân nhắc tất cả các từ trong câu (hoặc đoạn văn) khi dự đoán từ tiếp theo, không bị giới hạn bởi khoảng cách từ, giúp mô hình duy trì ngữ cảnh một cách toàn diện và chính xác hơn.  
+### Multi-Head vs. Single-Head Attention
+- **Single-Head**: Một lần self-attention, nắm bắt một khía cạnh.
+- **Multi-Head**: Nhiều lần self-attention, mỗi lần tập trung vào khía cạnh khác (cú pháp, ngữ nghĩa).
+- **Ví dụ**: “Con mèo ăn cá trên bàn” – đầu 1 chú ý “ăn” và “cá”, đầu 2 chú ý “mèo” và “cá”.
 
-- ⚖️ **Sự khác biệt trong cách hoạt động của BERT và GPT**: BERT dự đoán các từ bị ẩn trong câu dựa trên ngữ cảnh hai chiều nên phù hợp với các tác vụ như phân tích cảm xúc, hiểu ngữ nghĩa sâu sắc. Còn GPT sinh từ theo cách tuần tự, rất thích hợp cho việc tạo nội dung hoặc trả lời câu hỏi. Việc hiểu rõ sự khác biệt này giúp lựa chọn mô hình phù hợp cho từng nhiệm vụ cụ thể.  
+### Positional Encoding
+- Thêm vector vị trí (sin/cos) vào embedding để giữ thứ tự từ.
+- **Ví dụ**: “Tôi ăn cơm” – “Tôi” có vị trí 1, “ăn” có vị trí 2.
 
-- 🌍 **Transformer không chỉ dành cho ngôn ngữ**: Transformer còn được áp dụng cho các lĩnh vực khác như thị giác máy tính với Vision Transformers (ViT), giúp phân loại ảnh, phát hiện dị vật trên đường, phân loại khối u,... Điều này cho thấy tính đa dụng và mạnh mẽ của kiến trúc Transformer vượt ra ngoài giới hạn xử lý ngôn ngữ.  
-
-- 🔄 **Không đồng nhất giữa Transformer và LLM**: Hiểu rằng Transformer là một kiến trúc mạng nơ-ron trong khi LLM là một khái niệm rộng hơn về mô hình xử lý ngôn ngữ, có thể dựa trên nhiều kiến trúc khác nhau như RNN, LSTM, CNN. Việc không nhầm lẫn hai khái niệm này rất quan trọng để có cái nhìn đúng đắn về công nghệ và lựa chọn phương pháp phù hợp khi phát triển hoặc đánh giá mô hình.  
+### Ứng dụng cụ thể
+- **Dịch máy**: “I eat rice” → “Tôi ăn cơm”.
+- **Tạo văn bản (GPT)**: Sinh câu trả lời tự nhiên.
+- **Phân tích cảm xúc (BERT)**: Phân loại văn bản tích cực/tiêu cực.
+- **Vision Transformers**: Phân loại ảnh, phát hiện khối u.
