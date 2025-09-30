@@ -19,6 +19,16 @@
 - Ví dụ minh họa: ChatGPT – một LLM có thể hỏi về sở thích thư giãn, trả lời và lên kế hoạch như một người thật.
 - **Tóm lại:** LLM là mạng nơ-ron sâu được huấn luyện trên lượng dữ liệu khổng lồ, giúp thực hiện các tác vụ ngôn ngữ một cách linh hoạt và ngày càng giống con người.
 
+🔹 Ví dụ cụ thể về các LLMs nổi tiếng:
+
+- GPT-4 / GPT-5 (OpenAI) → mô hình đứng sau ChatGPT mà bạn đang dùng.
+
+- LLaMA 3 (Meta) → mã nguồn mở, được nhiều cộng đồng nghiên cứu dùng.
+
+- Gemini (Google DeepMind) → cạnh tranh trực tiếp với GPT, tích hợp trong Google.
+
+- Claude (Anthropic) → tập trung vào an toàn và đối thoại dài.
+
 ---
 
 ### 2. Tại sao gọi là “Large” Language Model?
