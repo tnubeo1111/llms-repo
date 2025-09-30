@@ -41,6 +41,8 @@ Transformer là một **kiến trúc mạng nơ-ron** được giới thiệu tr
 
 ![Parameters](/images/transformers-lec4.png)
 
+![Parameters](/images/transfomer-lec4.1.png)
+
 ### 3. Cơ chế tự chú ý (Self-Attention)
 - **Khái niệm**: Xác định mức độ quan trọng của từng từ đối với các từ khác.
 - **Cách hoạt động**:
